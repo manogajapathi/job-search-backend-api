@@ -13,6 +13,8 @@ function getJobDetails(req, res, next) {
 }
 
 var server = restify.createServer();
+server.use( restify.CORS( {origins: ['*']}) );
+server.use( restify.fullResponse() );
 server.get('/', getIndex);
 server.get('/api/jobs', getJobDetails);
 
