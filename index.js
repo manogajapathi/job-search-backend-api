@@ -13,11 +13,13 @@ const cors = corsMiddleware({
 
 // Creating sever and setting the routes
 var server = restify.createServer();
-server.pre(cors.preflight)
-server.use(cors.actual)
+server.pre(cors.preflight);
+server.use(cors.actual);
+server.use(restify.plugins.queryParser());
 server.get('/', getIndex);
 server.get('/api/jobs/list', getAllJobDetails);
 server.get('/api/jobs/:id', getJobDetails);
+server.get('/api/jobs/filter', getFilteredJobDetails);
 
 // Server deploy message on home page
 function getIndex(req, res, next) {
@@ -27,7 +29,7 @@ function getIndex(req, res, next) {
 
 // Display list of job details
 function getAllJobDetails(req, res, next) {
-  res.json(jobsData);
+  res.send({"code":200,"data":jobsData});
   next();
 }
 
@@ -37,10 +39,30 @@ function getJobDetails(req, res, next) {
   var selectedJob = jobsData.filter(function(i) {
     return i.jobID == id;
   }); 
-  res.json(selectedJob);
+  if(id < 1 || id > 25) {
+    res.send({"code":200,"message":"no job matched"});
+  }
+  else
+  res.send({"code":200,"data":selectedJob});
   next();
 }
 
+// Job filter with title
+function getFilteredJobDetails(req, res, next) {
+  var filter = req.query;
+  var jobTitle = filter.title;
+  var selectedJob = jobsData.filter(function(i) {
+    return i.jobTitle == jobTitle;
+  }); 
+  if(selectedJob == "") {
+    res.send({"code":200,"message":"no job title matched"});
+  }
+  else
+    res.send({"code":200,"data":selectedJob});
+  next();
+}
+
+// Starting the server on port 3000
 server.listen(port, function() {
   console.log('%s listening at %s', server.name, server.url);
 });
