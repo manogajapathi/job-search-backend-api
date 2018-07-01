@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "nodemon": "^1.17.5",
-    "restify": "^7.2.1"
+    "restify": "^7.2.1",
+    "restify-cors-middleware": "^1.1.1"
   }
 }

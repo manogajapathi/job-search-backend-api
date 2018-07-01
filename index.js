@@ -1,4 +1,5 @@
 const port = process.env.PORT || 3000;
+const corsMiddleware = require('restify-cors-middleware')
 var restify = require('restify');
 var jobsData = require('./job-search.json');
 
@@ -12,9 +13,16 @@ function getJobDetails(req, res, next) {
   next();
 }
 
+const cors = corsMiddleware({
+  preflightMaxAge: 5, 
+  origins: ['*'], 
+  allowHeaders: ['API-Token'],
+  exposeHeaders: ['API-Token-Expiry']
+})
+
 var server = restify.createServer();
-server.use( restify.CORS( {origins: ['*']}) );
-server.use( restify.fullResponse() );
+server.pre(cors.preflight)
+server.use(cors.actual)
 server.get('/', getIndex);
 server.get('/api/jobs', getJobDetails);
 
